@@ -1,13 +1,16 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { GoogleLogin } from "@react-oauth/google";
 import { useAuth } from "../context/AuthContext";
+import { useTheme } from "../context/ThemeContext";
 import "../App.css";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const { login } = useAuth();
+  const { login, loginWithGoogle } = useAuth();
+  const { theme } = useTheme();
   const navigate = useNavigate();
 
   async function handleSubmit(e) {
@@ -18,6 +21,16 @@ export default function Login() {
       navigate("/dashboard");
     } catch (err) {
       setError(err.response?.data?.message || "Login failed");
+    }
+  }
+
+  async function handleGoogleSuccess(credentialResponse) {
+    setError("");
+    try {
+      await loginWithGoogle(credentialResponse.credential);
+      navigate("/dashboard");
+    } catch (err) {
+      setError(err.response?.data?.message || "Google sign-in failed");
     }
   }
 
@@ -49,6 +62,14 @@ export default function Login() {
             Login
           </button>
         </form>
+        <div className="divider">or</div>
+        <div className="google-btn-wrap">
+          <GoogleLogin
+            theme={theme === "dark" ? "filled_black" : "outline"}
+            onSuccess={handleGoogleSuccess}
+            onError={() => setError("Google sign-in failed")}
+          />
+        </div>
         <p className="switch-link">
           No account? <Link to="/register">Register</Link>
         </p>

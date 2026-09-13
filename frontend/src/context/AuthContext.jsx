@@ -9,15 +9,24 @@ export function AuthProvider({ children }) {
     return stored ? JSON.parse(stored) : null;
   });
 
+  function applyAuthResult(data) {
+    localStorage.setItem("token", data.token);
+    localStorage.setItem("user", JSON.stringify(data.user));
+    setUser(data.user);
+  }
+
   async function login(email, password) {
     const res = await api.post("/auth/login", { email, password });
-    localStorage.setItem("token", res.data.token);
-    localStorage.setItem("user", JSON.stringify(res.data.user));
-    setUser(res.data.user);
+    applyAuthResult(res.data);
   }
 
   async function register(name, email, password) {
     await api.post("/auth/register", { name, email, password });
+  }
+
+  async function loginWithGoogle(credential) {
+    const res = await api.post("/auth/google", { credential });
+    applyAuthResult(res.data);
   }
 
   function logout() {
@@ -35,7 +44,9 @@ export function AuthProvider({ children }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, login, register, logout, updateUser }}>
+    <AuthContext.Provider
+      value={{ user, login, register, logout, updateUser, loginWithGoogle }}
+    >
       {children}
     </AuthContext.Provider>
   );
