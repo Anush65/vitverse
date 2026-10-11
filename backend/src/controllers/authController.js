@@ -56,6 +56,7 @@ async function login(req, res) {
         id: user._id,
         name: user.name,
         email: user.email,
+        role: user.role || "student",
       },
     });
   } catch (error) {
@@ -96,6 +97,7 @@ async function googleAuth(req, res) {
         id: user._id,
         name: user.name,
         email: user.email,
+        role: user.role || "student",
       },
     });
   } catch (error) {
