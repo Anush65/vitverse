@@ -4,6 +4,9 @@ const cors = require("cors");
 const authRoutes = require("./routes/authRoutes");
 const userRoutes = require("./routes/userRoutes");
 const noticeRoutes = require("./routes/noticeRoutes");
+const listingRoutes = require("./routes/listingRoutes");
+const path = require("path");
+const uploadRoutes = require("./routes/uploadRoutes");
 
 const app = express();
 
@@ -17,5 +20,9 @@ app.get("/api/health", (req, res) => {
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/notices", noticeRoutes);
+app.use("/api/listings", listingRoutes);
+app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
+app.use("/api/uploads", uploadRoutes);
 
 module.exports = app;
+

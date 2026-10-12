@@ -6,6 +6,7 @@ import Dashboard from "./pages/Dashboard";
 import Profile from "./pages/Profile";
 import Notices from "./pages/Notices";
 import ProtectedRoute from "./components/ProtectedRoute";
+import Marketplace from "./pages/Marketplace";
 import "./App.css";
 
 function App() {
@@ -49,6 +50,14 @@ function App() {
             <Notices />
           </ProtectedRoute>
         }
+      />
+      <Route
+      path="/marketplace"
+      element={
+      <ProtectedRoute>
+      <Marketplace />
+      </ProtectedRoute>
+      }
       />
     </Routes>
   );

@@ -21,6 +21,7 @@ export default function Navbar() {
       <div className="navbar-links">
         <Link to="/dashboard">Dashboard</Link>
         <Link to="/notices">Notices</Link>
+        <Link to="/marketplace">Marketplace</Link>
         <Link to="/profile">Profile</Link>
       </div>
       <div className="navbar-actions">
