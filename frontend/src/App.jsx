@@ -7,6 +7,7 @@ import Profile from "./pages/Profile";
 import Notices from "./pages/Notices";
 import Canteen from "./pages/Canteen";
 import ProtectedRoute from "./components/ProtectedRoute";
+import Marketplace from "./pages/Marketplace";
 import "./App.css";
 
 function App() {
@@ -51,6 +52,13 @@ function App() {
           </ProtectedRoute>
         }
       />
+      <Route
+      path="/marketplace"
+      element={
+      <ProtectedRoute>
+      <Marketplace />
+      </ProtectedRoute>
+      }
 
       <Route
         path="/canteen"
