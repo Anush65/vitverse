@@ -7,6 +7,7 @@ const noticeRoutes = require("./routes/noticeRoutes");
 const listingRoutes = require("./routes/listingRoutes");
 const path = require("path");
 const uploadRoutes = require("./routes/uploadRoutes");
+const canteenRoutes = require("./routes/canteenRoutes");
 
 const app = express();
 
@@ -23,6 +24,7 @@ app.use("/api/notices", noticeRoutes);
 app.use("/api/listings", listingRoutes);
 app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
 app.use("/api/uploads", uploadRoutes);
+app.use("/api/canteen", canteenRoutes);
 
 module.exports = app;
 

@@ -5,6 +5,7 @@ import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import Profile from "./pages/Profile";
 import Notices from "./pages/Notices";
+import Canteen from "./pages/Canteen";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Marketplace from "./pages/Marketplace";
 import "./App.css";
@@ -58,6 +59,14 @@ function App() {
       <Marketplace />
       </ProtectedRoute>
       }
+
+      <Route
+        path="/canteen"
+        element={
+          <ProtectedRoute>
+            <Canteen />
+          </ProtectedRoute>
+        }
       />
     </Routes>
   );
