@@ -1,42 +1,21 @@
-# VITVerse Bus Booking module
+# VITVerse Student Profile + App History Feature Package
 
-Drop-in React + Express + Mongoose module for the existing VITVerse project.
+Suggested branch: `feature/profile`
 
-## Rules
-- Routes: Alandur Metro (5 buses), Sholinganallur (4), Velachery (4).
-- Each bus: 60 seats, 12 rows; left side has 2 seats, aisle, right side has 3.
-- Daily departure: 1:45 PM IST.
-- Booking: 1:00 PM to before 1:30 PM IST.
-- Route edit/cancellation: 1:00 PM to before 1:20 PM IST.
-- One active booking per student per day; one active booking per seat/bus/date.
-- Successful booking, edit, and cancellation create notices.
+## Contents
+- `frontend/src/pages/Profile.jsx` — student profile and date-filterable activity history.
+- `frontend/src/pages/DashboardProfile.css` — styling used by the Profile page.
+- `frontend/src/services/dashboardProfileApi.js` — API helper for profile and history requests.
 
-## Integrate backend
-1. Copy `backend/models/BusBooking.js` and `BusNotice.js` into your backend models folder.
-2. Copy `backend/routes/busBooking.routes.js` into your backend routes folder.
-3. In your Express entry file, after JSON middleware, add:
-   ```js
-   const busBookingRoutes = require('./routes/busBooking.routes');
-   app.use('/api/bus-booking', busBookingRoutes);
-   ```
-4. Update the auth middleware import near the top of `busBooking.routes.js` to match your project. It must validate the user's token and set `req.user` with `_id` or `id`.
-5. Ensure your `User` object exposes a Mongo ObjectId. Token storage on frontend defaults to `localStorage.token` or `localStorage.authToken`.
+## Profile fields
+Student photo, register number, VIT email, program, branch, school, frequent bus route, and hostel block only when the student is a hostel resident. No wallet feature is included.
 
-## Integrate frontend
-Copy `frontend/src/pages/BusBooking.jsx` and `.css` into your frontend. Add a route in your existing router, e.g.:
-```jsx
-import BusBooking from './pages/BusBooking';
-<Route path="/bus-booking" element={<BusBooking />} />
-```
-Add a navigation link labelled **Bus Booking**. The component uses `VITE_API_URL` if configured, otherwise `http://localhost:5000`.
+## App History
+Date range and service filters for bus bookings, canteen orders and marketplace activity. The backend should provide actual records and stable IDs to prevent duplicate entries.
 
-## Notices page
-The module stores notices in `BusNotice`. GET `/api/bus-booking/notices/mine` returns the signed-in student's bus notices. Merge these into the existing Notices UI, or replace `BusNotice` with your app's existing shared notification model.
+## Integration
+Copy the files into matching paths in the existing VITVerse frontend. Add a route for `Profile` using the project's existing router and pass `initialUser` / `onBack` props if applicable.
 
-## Biometrics
-The module does NOT pretend that a booking code is biometric verification. Actual entry verification requires your campus biometric hardware/vendor API. Integrate that system before setting `biometricVerified` to true. The booking code is only a reference.
+The API helper uses proposed endpoints `/api/profile/me` and `/api/profile/history`. Update endpoint paths and auth handling to match the real backend. Real history requires backend integration; this package does not claim those endpoints already exist.
 
-## Production notes
-- Time-window checks are enforced on the server in Asia/Kolkata, not just by disabled UI controls.
-- MongoDB partial unique indexes prevent two active bookings for one student/day and two active reservations for the same seat. Use a replica set for transactions if you later add transactional booking+notice writes.
-- If old duplicate booking data exists, clean it before the unique indexes build.
+This is a feature package, not a complete standalone Vite project; integrate it into the existing app before running it.
