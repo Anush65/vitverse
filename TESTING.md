@@ -1,0 +1,12 @@
+# Test checklist
+- [ ] Availability lists 5 Alandur Metro buses, 4 Sholinganallur buses, 4 Velachery buses.
+- [ ] Every bus has 60 seats in 12 rows, each row 2 left + aisle + 3 right.
+- [ ] API rejects booking before 1:00 PM and at/after 1:30 PM IST.
+- [ ] API rejects route edits/cancellations at/after 1:20 PM IST.
+- [ ] Student cannot have two active bookings on the same date.
+- [ ] Two students cannot reserve the same seat/bus/date (unique MongoDB indexes).
+- [ ] Other students cannot edit/cancel a booking by guessing its ID.
+- [ ] Confirmation, edit, and cancellation each create a bus notice.
+- [ ] Merge GET `/api/bus-booking/notices/mine` into the existing Notices page.
+- [ ] Test with MongoDB indexes built; clean old duplicate records first if necessary.
+- [ ] Integrate and test the actual campus biometric device/API separately.
