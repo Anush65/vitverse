@@ -3,24 +3,47 @@ import AppLayout from "../layouts/AppLayout";
 import api from "../services/api";
 import "./Canteen.css";
 
+const STATUS_LABELS = {
+  placed: "Order placed",
+  preparing: "Preparing",
+  ready: "Ready for pickup",
+  completed: "Completed",
+  cancelled: "Cancelled",
+};
+
 export default function Canteen() {
   const [canteens, setCanteens] = useState([]);
   const [myEntry, setMyEntry] = useState(null);
   const [error, setError] = useState("");
+  const [notice, setNotice] = useState("");
   const [joiningId, setJoiningId] = useState(null);
+
+  const [openCanteen, setOpenCanteen] = useState(null);
+  const [menu, setMenu] = useState([]);
+  const [menuLoading, setMenuLoading] = useState(false);
+  const [cart, setCart] = useState({});
+  const [placing, setPlacing] = useState(false);
+
+  const [orders, setOrders] = useState([]);
 
   const fetchMyEntry = useCallback(async () => {
     const res = await api.get("/canteen/queues/me");
     setMyEntry(res.data);
   }, []);
 
+  const fetchOrders = useCallback(async () => {
+    const res = await api.get("/canteen/orders/mine");
+    setOrders(res.data);
+  }, []);
+
   useEffect(() => {
     api.get("/canteen/canteens").then((res) => setCanteens(res.data));
     fetchMyEntry();
+    fetchOrders();
 
     const interval = setInterval(fetchMyEntry, 5000);
     return () => clearInterval(interval);
-  }, [fetchMyEntry]);
+  }, [fetchMyEntry, fetchOrders]);
 
   async function handleJoin(canteenId) {
     setError("");
@@ -45,14 +68,82 @@ export default function Canteen() {
     }
   }
 
+  async function openMenu(canteen) {
+    setError("");
+    setCart({});
+    if (openCanteen?._id === canteen._id) {
+      setOpenCanteen(null);
+      return;
+    }
+    setOpenCanteen(canteen);
+    setMenuLoading(true);
+    try {
+      const res = await api.get(`/canteen/canteens/${canteen._id}/menu`);
+      setMenu(res.data);
+    } catch (err) {
+      setError(err.response?.data?.message || "Failed to load menu");
+    } finally {
+      setMenuLoading(false);
+    }
+  }
+
+  function changeQuantity(item, delta) {
+    setCart((prev) => {
+      const current = prev[item._id]?.quantity || 0;
+      const next = Math.max(0, current + delta);
+      const updated = { ...prev };
+      if (next === 0) {
+        delete updated[item._id];
+      } else {
+        updated[item._id] = { item, quantity: next };
+      }
+      return updated;
+    });
+  }
+
+  const cartEntries = Object.values(cart);
+  const cartTotal = cartEntries.reduce((sum, { item, quantity }) => sum + item.price * quantity, 0);
+  const cartCount = cartEntries.reduce((sum, { quantity }) => sum + quantity, 0);
+
+  async function placeOrder() {
+    setError("");
+    setNotice("");
+    setPlacing(true);
+    try {
+      await api.post("/canteen/orders", {
+        canteenId: openCanteen._id,
+        items: cartEntries.map(({ item, quantity }) => ({ menuItemId: item._id, quantity })),
+      });
+      setNotice(`Order placed at ${openCanteen.name}!`);
+      setCart({});
+      setOpenCanteen(null);
+      await fetchOrders();
+    } catch (err) {
+      setError(err.response?.data?.message || "Failed to place order");
+    } finally {
+      setPlacing(false);
+    }
+  }
+
+  async function cancelOrder(orderId) {
+    setError("");
+    try {
+      await api.delete(`/canteen/orders/${orderId}`);
+      await fetchOrders();
+    } catch (err) {
+      setError(err.response?.data?.message || "Failed to cancel order");
+    }
+  }
+
   return (
     <AppLayout>
-      <h1>Canteen Queue</h1>
-      <p>Join a virtual queue instead of standing in line.</p>
+      <h1>Canteen</h1>
+      <p>Join a live queue, or order food ahead and skip the line entirely.</p>
 
       {error && <p className="text-error" style={{ marginTop: "1rem" }}>{error}</p>}
+      {notice && <p className="text-success" style={{ marginTop: "1rem" }}>{notice}</p>}
 
-      {myEntry ? (
+      {myEntry && (
         <div className="card queue-status">
           <h2>{myEntry.canteen.name}</h2>
           <p>{myEntry.canteen.location}</p>
@@ -70,25 +161,113 @@ export default function Canteen() {
             Leave queue
           </button>
         </div>
-      ) : (
-        <div className="canteen-list">
-          {canteens.map((canteen) => (
-            <div key={canteen._id} className="card canteen-row">
+      )}
+
+      <div className="canteen-list">
+        {canteens.map((canteen) => (
+          <div key={canteen._id} className="canteen-block">
+            <div className="card canteen-row">
               <div>
                 <h2>{canteen.name}</h2>
                 <p>{canteen.location}</p>
               </div>
-              <button
-                type="button"
-                className="btn"
-                disabled={!canteen.isOpen || joiningId === canteen._id}
-                onClick={() => handleJoin(canteen._id)}
-              >
-                {canteen.isOpen ? "Join queue" : "Closed"}
-              </button>
+              <div className="canteen-actions">
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  disabled={!canteen.isOpen || !!myEntry || joiningId === canteen._id}
+                  onClick={() => handleJoin(canteen._id)}
+                >
+                  Join queue
+                </button>
+                <button
+                  type="button"
+                  className="btn"
+                  disabled={!canteen.isOpen}
+                  onClick={() => openMenu(canteen)}
+                >
+                  {openCanteen?._id === canteen._id ? "Close menu" : "Order food"}
+                </button>
+              </div>
+              {!canteen.isOpen && <span className="closed-pill">Closed</span>}
+            </div>
+
+            {openCanteen?._id === canteen._id && (
+              <div className="card menu-panel">
+                {menuLoading ? (
+                  <p>Loading menu...</p>
+                ) : menu.length === 0 ? (
+                  <p>No menu items available yet.</p>
+                ) : (
+                  <div className="menu-grid">
+                    {menu.map((item) => (
+                      <div key={item._id} className="menu-item">
+                        {item.image && <img src={item.image} alt={item.name} className="menu-item-image" />}
+                        <div className="menu-item-body">
+                          <div className="menu-item-title">
+                            <span className={`veg-dot ${item.isVeg ? "veg" : "nonveg"}`} />
+                            <h3>{item.name}</h3>
+                          </div>
+                          <p className="menu-item-description">{item.description}</p>
+                          <div className="menu-item-footer">
+                            <span className="menu-item-price">₹{item.price}</span>
+                            <div className="qty-stepper">
+                              <button type="button" onClick={() => changeQuantity(item, -1)}>
+                                −
+                              </button>
+                              <span>{cart[item._id]?.quantity || 0}</span>
+                              <button type="button" onClick={() => changeQuantity(item, 1)}>
+                                +
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {cartCount > 0 && (
+                  <div className="cart-bar">
+                    <span>
+                      {cartCount} item{cartCount > 1 ? "s" : ""} · ₹{cartTotal}
+                    </span>
+                    <button type="button" className="btn" disabled={placing} onClick={placeOrder}>
+                      {placing ? "Placing order..." : "Place order"}
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        ))}
+        {canteens.length === 0 && <p>No canteens available yet.</p>}
+      </div>
+
+      <h2 className="orders-heading">My Orders</h2>
+      {orders.length === 0 ? (
+        <p>No orders yet — order food from a canteen above.</p>
+      ) : (
+        <div className="orders-list">
+          {orders.map((order) => (
+            <div key={order._id} className="card order-card">
+              <div className="order-card-header">
+                <div>
+                  <h3>{order.canteen?.name}</h3>
+                  <p>{order.items.map((i) => `${i.name} ×${i.quantity}`).join(", ")}</p>
+                </div>
+                <div className="order-card-meta">
+                  <span className={`status-pill status-${order.status}`}>{STATUS_LABELS[order.status]}</span>
+                  <span className="order-total">₹{order.totalAmount}</span>
+                </div>
+              </div>
+              {order.status === "placed" && (
+                <button type="button" className="btn btn-secondary" onClick={() => cancelOrder(order._id)}>
+                  Cancel order
+                </button>
+              )}
             </div>
           ))}
-          {canteens.length === 0 && <p>No canteens available yet.</p>}
         </div>
       )}
     </AppLayout>

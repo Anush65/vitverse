@@ -3,6 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { GoogleLogin } from "@react-oauth/google";
 import { useAuth } from "../context/AuthContext";
 import { useTheme } from "../context/ThemeContext";
+import AuthHero from "../components/AuthHero";
 import "../App.css";
 
 export default function Login() {
@@ -36,6 +37,8 @@ export default function Login() {
 
   return (
     <div className="auth-shell">
+      <AuthHero />
+      <div className="auth-form-side">
       <div className="card auth-card">
         <div className="brand-heading">VITVerse</div>
         <h1>Welcome back</h1>
@@ -73,6 +76,7 @@ export default function Login() {
         <p className="switch-link">
           No account? <Link to="/register">Register</Link>
         </p>
+      </div>
       </div>
     </div>
   );
