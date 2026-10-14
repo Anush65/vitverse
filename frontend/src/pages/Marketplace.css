@@ -1,8 +1,8 @@
 
 .marketplace-page {
   min-height: 100vh;
-  background: var(--bg, #f5f7fb);
-  color: var(--text, #182230);
+  background: var(--color-bg);
+  color: var(--color-text);
 }
 
 .marketplace-container {
@@ -20,7 +20,7 @@
 }
 
 .marketplace-eyebrow {
-  color: #6558d3;
+  color: var(--color-primary);
   font-size: 12px;
   font-weight: 700;
   letter-spacing: 1.5px;
@@ -32,7 +32,7 @@
 }
 
 .marketplace-heading p {
-  color: var(--muted, #687386);
+  color: var(--color-text-secondary);
 }
 
 .marketplace-primary,
@@ -45,8 +45,12 @@
 }
 
 .marketplace-primary {
-  background: #6558d3;
-  color: white;
+  background: var(--color-primary);
+  color: var(--color-primary-contrast);
+}
+
+.marketplace-primary:hover {
+  background: var(--color-primary-hover);
 }
 
 .marketplace-primary:disabled {
@@ -56,8 +60,8 @@
 
 .marketplace-secondary {
   width: 100%;
-  background: #eeecff;
-  color: #5143bd;
+  background: var(--color-surface-hover);
+  color: var(--color-primary);
 }
 
 .marketplace-filters {
@@ -75,11 +79,11 @@
   box-sizing: border-box;
   width: 100%;
   min-width: 0;
-  border: 1px solid #dce1eb;
+  border: 1px solid var(--color-border);
   border-radius: 9px;
   padding: 12px;
-  background: var(--card-bg, white);
-  color: var(--text, #182230);
+  background: var(--color-surface);
+  color: var(--color-text);
   font: inherit;
 }
 
@@ -88,9 +92,9 @@
   gap: 18px;
   padding: 24px;
   margin-bottom: 28px;
-  border: 1px solid #e1e5ef;
+  border: 1px solid var(--color-border);
   border-radius: 15px;
-  background: var(--card-bg, white);
+  background: var(--color-surface);
 }
 
 .listing-form h2 {
@@ -123,10 +127,10 @@
 
 .listing-card {
   overflow: hidden;
-  border: 1px solid #e5e8ef;
+  border: 1px solid var(--color-border);
   border-radius: 15px;
-  background: var(--card-bg, white);
-  box-shadow: 0 5px 18px rgba(20, 30, 60, 0.05);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-card);
 }
 
 .listing-image,
@@ -139,8 +143,8 @@
 .listing-image-placeholder {
   display: grid;
   place-items: center;
-  background: #eceef5;
-  color: #737c8c;
+  background: var(--color-surface-hover);
+  color: var(--color-text-secondary);
 }
 
 .listing-card-content {
@@ -156,8 +160,8 @@
 .listing-tags span {
   padding: 5px 9px;
   border-radius: 20px;
-  background: #f0efff;
-  color: #5749bf;
+  background: var(--color-surface-hover);
+  color: var(--color-primary);
   font-size: 12px;
 }
 
@@ -168,7 +172,7 @@
 
 .listing-description {
   min-height: 42px;
-  color: var(--muted, #687386);
+  color: var(--color-text-secondary);
   overflow-wrap: anywhere;
 }
 
@@ -181,7 +185,7 @@
 .listing-price span,
 .listing-condition,
 .listing-seller {
-  color: var(--muted, #687386);
+  color: var(--color-text-secondary);
   font-size: 13px;
 }
 
@@ -189,14 +193,14 @@
 .marketplace-message {
   padding: 48px 20px;
   text-align: center;
-  color: var(--muted, #687386);
+  color: var(--color-text-secondary);
 }
 
 .marketplace-error {
   padding: 12px 16px;
   border-radius: 8px;
-  background: #fff0f0;
-  color: #b42318;
+  background: var(--color-surface-hover);
+  color: var(--color-error);
 }
 
 @media (max-width: 950px) {

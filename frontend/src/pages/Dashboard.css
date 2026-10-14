@@ -1,0 +1,58 @@
+.dashboard-header {
+  margin-bottom: 2rem;
+}
+
+.dashboard-eyebrow {
+  color: var(--color-primary);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  margin-bottom: 0.5rem;
+}
+
+.dashboard-header h1 {
+  font-size: clamp(1.6rem, 3vw, 2.2rem);
+}
+
+.dashboard-subtitle {
+  margin-top: 0.4rem;
+}
+
+.feature-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.25rem;
+}
+
+.feature-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 1.5rem;
+  border-radius: 14px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-card);
+  text-decoration: none;
+  color: var(--color-text);
+  transition: transform 0.15s ease, border-color 0.15s ease;
+}
+
+.feature-card:hover {
+  transform: translateY(-3px);
+  border-color: var(--color-primary);
+}
+
+.feature-icon {
+  font-size: 2rem;
+}
+
+.feature-card h2 {
+  font-size: 1.1rem;
+  margin: 0;
+}
+
+.feature-card p {
+  font-size: 0.88rem;
+  margin: 0;
+}

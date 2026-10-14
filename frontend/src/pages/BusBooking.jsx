@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import AppLayout from '../layouts/AppLayout';
 import './BusBooking.css';
 
 const API_BASE = (import.meta.env.VITE_API_URL || 'http://localhost:5000').replace(/\/$/, '');
@@ -77,7 +78,7 @@ export default function BusBooking() {
     finally { setBusy(false); }
   }
 
-  return <main className="bus-page">
+  return <AppLayout><main className="bus-page">
     <header className="bus-heading"><div><p className="bus-eyebrow">VITVERSE · CAMPUS TRANSPORT</p><h1>Bus Booking</h1><p className="bus-subtitle">Reserve one seat for today's 1:45 PM departure.</p></div><div className="bus-departure"><span>DEPARTURE</span><strong>1:45 PM</strong><small>Every day · Sharp</small></div></header>
     <section className="bus-rules"><div><i className="dot open"/><b>1:00 PM</b><small>Booking opens</small></div><div><i className="dot edit"/><b>1:20 PM</b><small>Edit / cancel closes</small></div><div><i className="dot close"/><b>1:30 PM</b><small>Booking closes</small></div></section>
     {error && <div className="bus-alert error" role="alert">{error}</div>}{notice && <div className="bus-alert success" role="status">{notice}</div>}
@@ -94,7 +95,7 @@ export default function BusBooking() {
     </section>
     {booking && <div className="cancel-row"><div><b>Need to cancel?</b><span>Available only before 1:20 PM IST.</span></div><button type="button" className="cancel-button" disabled={!editOpen || busy} onClick={cancelBooking}>Cancel booking</button></div>}
     <section className="biometric-note"><span>⌁</span><div><b>Secure boarding</b><p>Your reservation is linked to your student account. At the bus, the campus biometric device must verify your identity. Real biometric verification requires integration with the campus device/vendor API.</p></div></section><button className="refresh-button" type="button" onClick={load}>↻ Refresh seat availability</button>
-  </main>;
+  </main></AppLayout>;
 
   function seatButton(id) {
     const isTaken = occupied.has(id) && id !== booking?.seatId;

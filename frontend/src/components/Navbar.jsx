@@ -23,6 +23,7 @@ export default function Navbar() {
         <Link to="/notices">Notices</Link>
         <Link to="/marketplace">Marketplace</Link>
         <Link to="/canteen">Canteen</Link>
+        <Link to="/bus-booking">Bus</Link>
         <Link to="/profile">Profile</Link>
       </div>
       <div className="navbar-actions">

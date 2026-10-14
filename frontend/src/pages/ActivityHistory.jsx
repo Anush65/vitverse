@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { getMyHistory, getMyProfile } from '../services/dashboardProfileApi';
-import './DashboardProfile.css';
+import './ActivityHistory.css';
 
 const dateString = (date) => date.toISOString().slice(0, 10);
 const today = dateString(new Date());

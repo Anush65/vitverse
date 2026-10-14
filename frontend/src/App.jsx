@@ -8,6 +8,7 @@ import Notices from "./pages/Notices";
 import Canteen from "./pages/Canteen";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Marketplace from "./pages/Marketplace";
+import BusBooking from "./pages/BusBooking";
 import "./App.css";
 
 function App() {
@@ -53,18 +54,28 @@ function App() {
         }
       />
       <Route
-      path="/marketplace"
-      element={
-      <ProtectedRoute>
-      <Marketplace />
-      </ProtectedRoute>
-      }
+        path="/marketplace"
+        element={
+          <ProtectedRoute>
+            <Marketplace />
+          </ProtectedRoute>
+        }
+      />
 
       <Route
         path="/canteen"
         element={
           <ProtectedRoute>
             <Canteen />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/bus-booking"
+        element={
+          <ProtectedRoute>
+            <BusBooking />
           </ProtectedRoute>
         }
       />

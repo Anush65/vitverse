@@ -3,12 +3,11 @@ const crypto = require('crypto');
 const mongoose = require('mongoose');
 const BusBooking = require('../models/BusBooking');
 const BusNotice = require('../models/BusNotice');
+const User = require('../models/User');
 
-// CHANGE THIS IMPORT to the auth middleware already used in your VITVerse backend.
-// It must validate the JWT and attach the user to req.user.
-const authModule = require('../middleware/authMiddleware');
-const requireAuth = typeof authModule === 'function' ? authModule : authModule.protect;
-if (typeof requireAuth !== 'function') throw new Error('Configure the bus booking auth middleware import/export.');
+// VITVerse's protect middleware verifies the JWT and sets req.userId (a string),
+// not req.user — the rest of this file reads req.userId accordingly.
+const requireAuth = require('../middleware/authMiddleware');
 
 const router = express.Router();
 router.use(requireAuth);
@@ -38,13 +37,13 @@ function requireEditWindow() {
   if (m < 780 || m >= 800) fail('Route edits and cancellations are allowed from 1:00 PM until 1:20 PM IST.', 403);
 }
 function getStudentId(req) {
-  const id = req.user?._id || req.user?.id || req.user?.userId || req.user?.sub;
+  const id = req.userId;
   if (!id || !mongoose.Types.ObjectId.isValid(String(id))) fail('Your login session did not contain a valid student ID.', 401);
   return new mongoose.Types.ObjectId(String(id));
 }
-function studentInfo(req) {
-  const u = req.user || {};
-  return { studentName: u.name || u.fullName || u.username || '', registerNumber: u.registerNumber || u.regNo || u.registrationNumber || '' };
+async function studentInfo(req) {
+  const user = await User.findById(req.userId).select('name');
+  return { studentName: user?.name || '', registerNumber: '' };
 }
 function seatIds() {
   const ids = [];
@@ -105,7 +104,7 @@ router.post('/', async (req, res) => {
     if (!Number.isInteger(busNumber) || busNumber < 1 || busNumber > ROUTES[route]) fail('Invalid bus number for this route.');
     if (!seatIds().includes(seatId)) fail('Select a valid seat.');
     if (await BusBooking.exists({ studentId, serviceDate, status: 'confirmed' })) fail('You can book only one seat per day. Edit your existing booking before 1:20 PM.', 409);
-    const booking = await BusBooking.create({ studentId, ...studentInfo(req), serviceDate, route, busNumber, seatId,
+    const booking = await BusBooking.create({ studentId, ...(await studentInfo(req)), serviceDate, route, busNumber, seatId,
       bookingCode: crypto.randomBytes(5).toString('hex').toUpperCase() });
     await createNotice({ studentId, title: 'Bus booking confirmed',
       message: `Your ${route} bus booking is confirmed for today at 1:45 PM. Bus ${busNumber}, seat ${seatId}. Boarding is subject to campus biometric verification.`,

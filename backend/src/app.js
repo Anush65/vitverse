@@ -8,6 +8,7 @@ const listingRoutes = require("./routes/listingRoutes");
 const path = require("path");
 const uploadRoutes = require("./routes/uploadRoutes");
 const canteenRoutes = require("./routes/canteenRoutes");
+const busBookingRoutes = require("./routes/busBookingRoutes");
 
 const app = express();
 
@@ -25,6 +26,7 @@ app.use("/api/listings", listingRoutes);
 app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
 app.use("/api/uploads", uploadRoutes);
 app.use("/api/canteen", canteenRoutes);
+app.use("/api/bus-booking", busBookingRoutes);
 
 module.exports = app;
 
