@@ -3,8 +3,8 @@ const Listing = require("../models/Listing");
 
 exports.getListings = async (req, res) => {
   try {
-    const { search, category, type, minPrice, maxPrice } = req.query;
-    const filter = { status: "available" };
+    const { search, category, type, minPrice, maxPrice, seller } = req.query;
+    const filter = seller ? { seller } : { status: "available" };
 
     if (search) {
       filter.$or = [

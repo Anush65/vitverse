@@ -31,6 +31,27 @@ const userSchema = new mongoose.Schema(
       enum: ["student", "admin"],
       default: "student",
     },
+    bio: {
+      type: String,
+      trim: true,
+      maxlength: 200,
+      default: "",
+    },
+    branch: {
+      type: String,
+      trim: true,
+      default: "",
+    },
+    year: {
+      type: String,
+      enum: ["1st Year", "2nd Year", "3rd Year", "4th Year", ""],
+      default: "",
+    },
+    hostelBlock: {
+      type: String,
+      trim: true,
+      default: "",
+    },
   },
   { timestamps: true }
 );

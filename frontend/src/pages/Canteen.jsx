@@ -1,6 +1,8 @@
 import { useEffect, useState, useCallback } from "react";
+import { motion } from "framer-motion";
 import AppLayout from "../layouts/AppLayout";
 import api from "../services/api";
+import { useToast } from "../context/ToastContext";
 import "./Canteen.css";
 
 const STATUS_LABELS = {
@@ -12,6 +14,7 @@ const STATUS_LABELS = {
 };
 
 export default function Canteen() {
+  const showToast = useToast();
   const [canteens, setCanteens] = useState([]);
   const [myEntry, setMyEntry] = useState(null);
   const [error, setError] = useState("");
@@ -51,8 +54,11 @@ export default function Canteen() {
     try {
       await api.post("/canteen/queues/join", { canteenId });
       await fetchMyEntry();
+      showToast("You're in the queue!");
     } catch (err) {
-      setError(err.response?.data?.message || "Failed to join queue");
+      const message = err.response?.data?.message || "Failed to join queue";
+      setError(message);
+      showToast(message, "error");
     } finally {
       setJoiningId(null);
     }
@@ -63,8 +69,11 @@ export default function Canteen() {
     try {
       await api.delete(`/canteen/queues/${myEntry._id}`);
       setMyEntry(null);
+      showToast("Left the queue");
     } catch (err) {
-      setError(err.response?.data?.message || "Failed to leave queue");
+      const message = err.response?.data?.message || "Failed to leave queue";
+      setError(message);
+      showToast(message, "error");
     }
   }
 
@@ -115,11 +124,14 @@ export default function Canteen() {
         items: cartEntries.map(({ item, quantity }) => ({ menuItemId: item._id, quantity })),
       });
       setNotice(`Order placed at ${openCanteen.name}!`);
+      showToast(`Order placed at ${openCanteen.name}! 🎉`);
       setCart({});
       setOpenCanteen(null);
       await fetchOrders();
     } catch (err) {
-      setError(err.response?.data?.message || "Failed to place order");
+      const message = err.response?.data?.message || "Failed to place order";
+      setError(message);
+      showToast(message, "error");
     } finally {
       setPlacing(false);
     }
@@ -130,8 +142,11 @@ export default function Canteen() {
     try {
       await api.delete(`/canteen/orders/${orderId}`);
       await fetchOrders();
+      showToast("Order cancelled");
     } catch (err) {
-      setError(err.response?.data?.message || "Failed to cancel order");
+      const message = err.response?.data?.message || "Failed to cancel order";
+      setError(message);
+      showToast(message, "error");
     }
   }
 
@@ -193,15 +208,27 @@ export default function Canteen() {
             </div>
 
             {openCanteen?._id === canteen._id && (
-              <div className="card menu-panel">
+              <motion.div
+                className="card menu-panel"
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                transition={{ duration: 0.25 }}
+              >
                 {menuLoading ? (
                   <p>Loading menu...</p>
                 ) : menu.length === 0 ? (
                   <p>No menu items available yet.</p>
                 ) : (
                   <div className="menu-grid">
-                    {menu.map((item) => (
-                      <div key={item._id} className="menu-item">
+                    {menu.map((item, i) => (
+                      <motion.div
+                        key={item._id}
+                        className="menu-item"
+                        initial={{ opacity: 0, y: 12 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: i * 0.04, duration: 0.3 }}
+                        whileHover={{ y: -3 }}
+                      >
                         {item.image && <img src={item.image} alt={item.name} className="menu-item-image" />}
                         <div className="menu-item-body">
                           <div className="menu-item-title">
@@ -222,7 +249,7 @@ export default function Canteen() {
                             </div>
                           </div>
                         </div>
-                      </div>
+                      </motion.div>
                     ))}
                   </div>
                 )}
@@ -237,7 +264,7 @@ export default function Canteen() {
                     </button>
                   </div>
                 )}
-              </div>
+              </motion.div>
             )}
           </div>
         ))}

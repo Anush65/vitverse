@@ -2,10 +2,10 @@
 // Safe to re-run: it upserts users (never deletes any existing account) and
 // fully replaces only the feature data (canteens, menu, orders, queue,
 // notices, listings, bus bookings) so every run leaves a clean, consistent
-// demo state.
+// demo state. Also auto-run once by server.js if the database is empty, so
+// a fresh clone never shows a blank app.
 require("dotenv").config();
 const bcrypt = require("bcryptjs");
-const connectDB = require("./config/db");
 
 const User = require("./models/User");
 const Canteen = require("./models/Canteen");
@@ -43,9 +43,7 @@ async function upsertUser({ name, email, role }) {
   );
 }
 
-async function seed() {
-  await connectDB();
-
+async function runSeed() {
   console.log("\nSeeding users...");
   const admin = await upsertUser({ name: "Admin User", email: "admin@vitstudent.ac.in", role: "admin" });
   const students = await Promise.all(
@@ -218,11 +216,18 @@ async function seed() {
   console.log(`  Admin:    ${admin.email}`);
   students.forEach((s) => console.log(`  Student:  ${s.email}`));
   console.log("================================================\n");
-
-  process.exit(0);
 }
 
-seed().catch((error) => {
-  console.error("Seed failed:", error);
-  process.exit(1);
-});
+module.exports = runSeed;
+
+// Run directly via `npm run seed` (not when imported by server.js)
+if (require.main === module) {
+  const connectDB = require("./config/db");
+  connectDB()
+    .then(runSeed)
+    .then(() => process.exit(0))
+    .catch((error) => {
+      console.error("Seed failed:", error);
+      process.exit(1);
+    });
+}

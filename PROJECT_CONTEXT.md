@@ -6,7 +6,7 @@ bus booking, hostel exchange, food sharing, notices). College Software
 Engineering project. Progressive Web Application.
 
 ## Tech Stack
-- Frontend: React + Vite (JavaScript), React Router, axios, @react-oauth/google
+- Frontend: React + Vite (JavaScript), React Router, axios, @react-oauth/google, framer-motion
 - Backend: Node.js + Express.js (JavaScript, monolithic)
 - Database: MongoDB (Atlas free tier) + Mongoose
 - Auth: Email/password (bcryptjs + JWT) and Google OAuth, both VIT-domain restricted
@@ -53,7 +53,7 @@ and `backend/routes` (outside `src/`), and that route wasn't mounted in
 `app.js` at all, so Bus Booking was completely unreachable until this pass.
 
 ## Database Models
-- **User**: `name`, `email` (unique, regex-restricted to `@vitstudent.ac.in`), `password` (bcrypt hash, optional if `googleId` set), `googleId` (sparse unique), `role` (`student`|`admin`, default `student`).
+- **User**: `name`, `email` (unique, regex-restricted to `@vitstudent.ac.in`), `password` (bcrypt hash, optional if `googleId` set), `googleId` (sparse unique), `role` (`student`|`admin`, default `student`), `bio`, `branch`, `year` (enum), `hostelBlock` (all optional, editable via Profile).
 - **Notice**: `title`, `content`, `category` (enum), `createdBy` (ref User). Admin-only write.
 - **Canteen**: `name`, `location`, `avgServingMinutes` (default 3), `isOpen`.
 - **Queue**: `canteen` (ref), `user` (ref), `status` (`waiting`|`served`|`cancelled`), `servedAt`. Position/ETA computed on read, not stored.
@@ -81,8 +81,12 @@ and `backend/routes` (outside `src/`), and that route wasn't mounted in
 - `AuthHero` component — the gradient brand panel on Login/Register (two-column layout, hidden below 860px, collapses to the plain centered card).
 - `AppLayout` (Navbar + content, now 1100px max-width) wraps all logged-in pages, including Marketplace and Bus Booking; Login/Register use the two-column `AuthHero` + form layout.
 - Dashboard has a gradient hero banner (time-of-day greeting) above the feature-card grid.
-- Marketplace.css and BusBooking.css originally used their own disconnected CSS variable names (some tied to `prefers-color-scheme` only) and always rendered in light mode regardless of the in-app toggle — remapped to the shared tokens so the whole app now switches theme consistently.
-- Verified by rendering actual pages with Playwright + screenshotting (not just build-checking) — dark/light both confirmed visually correct on Login, Register, and Dashboard.
+- Marketplace.css and BusBooking.css originally used their own disconnected CSS variable names (some tied to `prefers-color-scheme` only) and always rendered in light mode regardless of the in-app toggle — remapped to the shared tokens so the whole app now switches theme consistently. Marketplace now uses `AppLayout` like every other page instead of its own `<Navbar>`.
+- **Per-module accent colors** (`--accent-marketplace` amber, `--accent-canteen` emerald, `--accent-bus` sky blue, `--accent-notices` rose, `--accent-profile` violet, each with a `-soft` tint for icon backgrounds), used on Dashboard/Landing feature cards and Profile stat chips — breaks the single-indigo "generic SaaS" monotone while keeping indigo as the one consistent brand color for nav/buttons/CTAs.
+- **`framer-motion`** drives real animation: staggered entrance on Dashboard/Landing feature grids and Marketplace/Canteen-menu item grids, `whileHover`/`whileTap` micro-interactions on cards, animated expand on the Canteen menu panel.
+- **Toast notifications** (`context/ToastContext.jsx`) — bottom-right stack, spring-animated in/out via framer-motion, used for transient success/error feedback (queue join/leave, order placed/cancelled, listing published, profile saved) instead of only inline text.
+- **`pages/Landing.jsx`** — a real public marketing page at `/` (previously just redirected straight to `/login`): animated gradient-blob hero, stat band, per-module-colored feature grid with scroll-reveal (`whileInView`), CTA band, footer. Redirects to `/dashboard` if already logged in.
+- Verified by rendering actual pages with Playwright + screenshotting (not just build-checking) — caught and fixed one real contrast bug this way (an eyebrow label on Landing was invisible in light mode, reusing a style meant for a colored banner).
 
 ## API Conventions
 Base path `/api/...`:
@@ -98,7 +102,9 @@ Base path `/api/...`:
 - `POST /api/canteen/orders` (place order from cart), `GET /api/canteen/orders/mine`,
   `DELETE /api/canteen/orders/:id` (cancel own, only while status is `placed`),
   `PUT /api/canteen/orders/:id/status` (admin)
-- `GET/POST/PUT/DELETE /api/listings[/:id]` (read: public to logged-in users; write: owner only)
+- `GET/POST/PUT/DELETE /api/listings[/:id]` (read: public to logged-in users; write: owner only).
+  `GET /api/listings?seller=<userId>` returns that seller's listings of any
+  status (not just `available`), used by Profile's live stats.
 - `POST /api/uploads` (multipart image upload, used by Marketplace's "list an item" form)
 - `GET /api/bus-booking/availability`, `GET /api/bus-booking/mine`,
   `POST /api/bus-booking/`, `PATCH /api/bus-booking/:id`, `DELETE /api/bus-booking/:id`,
@@ -132,13 +138,22 @@ Base path `/api/...`:
   and 3 sample canteen orders); major visual overhaul (Google Font, richer
   color/shadow tokens, sticky+active-state Navbar with icons, two-column
   gradient auth pages, gradient Dashboard hero).
+- **Pre-review pass 3:** auto-seed on empty-DB boot (the "forgot to run
+  `npm run seed`" failure mode can no longer happen — `server.js` checks and
+  seeds automatically); real public Landing page with framer-motion
+  animations; toast notification system; per-module accent color identity;
+  framer-motion micro-interactions across Dashboard/Landing/Marketplace/
+  Canteen; Marketplace switched to the shared `AppLayout`; Profile expanded
+  with bio/branch/year/hostel fields and live stats (listings posted,
+  canteen orders) backed by a new `?seller=` filter on `GET /api/listings`.
 
 ## Current Task
-Pre-review polish pass complete (2 rounds). See Known Issues for what still
+Pre-review polish pass complete (3 rounds). See Known Issues for what still
 needs a human — the sandbox this was done in has no network access to
 MongoDB, so no DB-backed page was tested against live data. The UI itself
-(Login/Register/Dashboard) was visually verified by rendering real pages
-with Playwright and screenshotting both themes — not just build-checked.
+(Landing, Login, Register, Dashboard, Profile) was visually verified by
+rendering real pages with Playwright and screenshotting both themes — not
+just build-checked.
 
 ## Pending Tasks (high-level, see Gantt for full breakdown)
 Hostel Exchange / Food Sharing -> Notifications -> Admin panel ->
@@ -170,7 +185,9 @@ Frontend `.env` (see `frontend/.env.example`):
 - Frontend: `cd frontend && npm install && npm run dev` (serves on :5173)
 - Backend: `cd backend && npm install && npm run dev` (serves on :5000, needs `.env`)
 - Seed demo data: `cd backend && npm run seed` (safe to re-run — upserts users,
-  replaces feature data; prints demo login credentials when done)
+  replaces feature data; prints demo login credentials when done). Also runs
+  **automatically** on server boot if the `Canteen` collection is empty, so
+  a fresh clone is never blank even if you forget to run it manually.
 - After every `git pull`, re-run `npm install` in any folder whose `package.json` changed.
 
 ## Testing
@@ -213,12 +230,17 @@ menus + live queue + sample orders, 16 notices, 20 marketplace listings,
   network access to MongoDB (DNS/raw TCP both blocked, only an HTTPS proxy
   available) — every backend/DB-dependent change was verified by full
   production builds, syntax checks, and manual schema/logic review only,
-  **never against a live database**. The frontend's visual design (Login,
-  Register, Dashboard) *was* rendered and screenshotted with a real headless
-  browser in both themes, so that part is confirmed working — but nothing
-  behind a login (Canteen ordering, Marketplace, Bus Booking, Notices) has
-  been clicked through for real. Run `npm run seed` and click through every
+  **never against a live database**. The frontend's visual design (Landing,
+  Login, Register, Dashboard, Profile) *was* rendered and screenshotted with
+  a real headless browser in both themes, so that part is confirmed working —
+  but nothing behind a login that needs real data (Canteen ordering,
+  Marketplace, Bus Booking, Notices) has been clicked through for real. Run
+  the app (seeding is now automatic on first boot) and click through every
   module before the review.
+- If data still looks empty after pulling: confirm `npm install` was re-run
+  in `backend/` (new deps: `framer-motion` is frontend-only, nothing new on
+  backend this round) and that the backend actually restarted — auto-seed
+  only runs once, at boot, when `Canteen` is empty.
 - Canteen now has two related-but-separate concepts: the original virtual
   **queue** (position/ETA, no food involved) and the new **ordering** system
   (menu + cart + Order). Both work independently per canteen; a queue entry

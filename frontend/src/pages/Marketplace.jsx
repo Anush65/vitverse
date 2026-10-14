@@ -1,7 +1,9 @@
 
 import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
 import api from "../services/api";
-import Navbar from "../components/Navbar";
+import AppLayout from "../layouts/AppLayout";
+import { useToast } from "../context/ToastContext";
 import "./Marketplace.css";
 
 const categories = [
@@ -15,6 +17,7 @@ const categories = [
 ];
 
 export default function Marketplace() {
+  const showToast = useToast();
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState("");
   const [listings, setListings] = useState([]);
@@ -120,18 +123,19 @@ export default function Marketplace() {
 
       setShowForm(false);
       await fetchListings();
+      showToast("Listing published! 🎉");
     } catch (err) {
-      setError(err.response?.data?.message || "Could not create listing. Please log in again if your session has expired.");
+      const message = err.response?.data?.message || "Could not create listing. Please log in again if your session has expired.";
+      setError(message);
+      showToast(message, "error");
     } finally {
       setSaving(false);
     }
   }
 
   return (
-    <div className="marketplace-page">
-      <Navbar />
-
-      <main className="marketplace-container">
+    <AppLayout>
+      <div className="marketplace-container">
         <section className="marketplace-heading">
           <div>
             <p className="marketplace-eyebrow">THE VIT STUDENT COMMUNITY</p>
@@ -300,8 +304,15 @@ export default function Marketplace() {
           </div>
         ) : (
           <section className="listing-grid">
-            {listings.map((item) => (
-              <article className="listing-card" key={item._id}>
+            {listings.map((item, i) => (
+              <motion.article
+                className="listing-card"
+                key={item._id}
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: Math.min(i, 8) * 0.05, duration: 0.3 }}
+                whileHover={{ y: -5 }}
+              >
                 {item.images?.[0] ? (
                   <img
                     className="listing-image"
@@ -348,11 +359,11 @@ export default function Marketplace() {
                     Contact Seller
                   </button>
                 </div>
-              </article>
+              </motion.article>
             ))}
           </section>
         )}
-      </main>
-    </div>
+      </div>
+    </AppLayout>
   );
 }

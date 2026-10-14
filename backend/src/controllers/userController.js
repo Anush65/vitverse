@@ -8,15 +8,19 @@ async function getMe(req, res) {
   res.json(user);
 }
 
+const EDITABLE_FIELDS = ["name", "bio", "branch", "year", "hostelBlock"];
+
 async function updateMe(req, res) {
   try {
-    const { name } = req.body;
+    const updates = {};
+    for (const field of EDITABLE_FIELDS) {
+      if (req.body[field] !== undefined) updates[field] = req.body[field];
+    }
 
-    const user = await User.findByIdAndUpdate(
-      req.userId,
-      { name },
-      { new: true, runValidators: true }
-    ).select("-password");
+    const user = await User.findByIdAndUpdate(req.userId, updates, {
+      new: true,
+      runValidators: true,
+    }).select("-password");
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });
