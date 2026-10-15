@@ -1,5 +1,5 @@
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import api from "../services/api";
 import AppLayout from "../layouts/AppLayout";
@@ -41,19 +41,29 @@ export default function Marketplace() {
     condition: "Good",
     imageUrl: "",
   });
+
+  useEffect(() => {
+    if (!imagePreview) return undefined;
+    return () => URL.revokeObjectURL(imagePreview);
+  }, [imagePreview]);
+
   function handleImageChange(event) {
     const file = event.target.files?.[0];
     if (!file) return;
     if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
-        setError("Choose a JPG, PNG, or WebP image.");
-        event.target.value = "";
-        return;
+      setError("Choose a JPG, PNG, or WebP image.");
+      setImageFile(null);
+      setImagePreview("");
+      event.target.value = "";
+      return;
     }
 
     if (file.size > 5 * 1024 * 1024) {
-        setError("Image must be 5 MB or smaller.");
-        event.target.value = "";
-        return;
+      setError("Image must be 5 MB or smaller.");
+      setImageFile(null);
+      setImagePreview("");
+      event.target.value = "";
+      return;
     }
 
     setError("");
@@ -61,7 +71,7 @@ export default function Marketplace() {
     setImagePreview(URL.createObjectURL(file));
 }
 
-  async function fetchListings() {
+  const fetchListings = useCallback(async () => {
     setLoading(true);
     setError("");
 
@@ -75,11 +85,11 @@ export default function Marketplace() {
     } finally {
       setLoading(false);
     }
-  }
+  }, [search, category, type, minPrice, maxPrice]);
 
   useEffect(() => {
     fetchListings();
-  }, [search, category, type, minPrice, maxPrice]);
+  }, [fetchListings]);
 
   function updateForm(event) {
     setForm({ ...form, [event.target.name]: event.target.value });
@@ -87,27 +97,27 @@ export default function Marketplace() {
 
   async function handleSubmit(event) {
     event.preventDefault();
+    const formElement = event.currentTarget;
+    if (!imageFile) {
+      setError("Add a clear photo of your item so other students know what they’re getting.");
+      return;
+    }
     setSaving(true);
     setError("");
 
     try {
-        let images = [];
-        if (imageFile) {
-            const uploadData = new FormData();
-            uploadData.append("image", imageFile);
+      const uploadData = new FormData();
+      uploadData.append("image", imageFile);
 
-            const uploadResponse = await api.post("/uploads", uploadData);
+      const uploadResponse = await api.post("/uploads", uploadData);
 
-            images = [
-                `http://localhost:5000${uploadResponse.data.imageUrl}`,
-            ];
-        }
+      const images = [new URL(uploadResponse.data.imageUrl, api.defaults.baseURL).toString()];
 
-        await api.post("/listings", {
-            ...form,
-            price: Number(form.price),
-            images,
-        });
+      await api.post("/listings", {
+        ...form,
+        price: Number(form.price),
+        images,
+      });
 
 
       setForm({
@@ -120,6 +130,9 @@ export default function Marketplace() {
         condition: "Good",
         imageUrl: "",
       });
+      setImageFile(null);
+      setImagePreview("");
+      formElement.reset();
 
       setShowForm(false);
       await fetchListings();
@@ -138,21 +151,24 @@ export default function Marketplace() {
       <div className="marketplace-container">
         <section className="marketplace-heading">
           <div>
-            <p className="marketplace-eyebrow">THE VIT STUDENT COMMUNITY</p>
-            <h1>Campus Marketplace</h1>
-            <p>Buy, sell, and rent essentials from fellow students.</p>
+            <p className="marketplace-eyebrow">GOOD FINDS, GOOD PEOPLE</p>
+            <h1>Campus Marketplace<span className="marketplace-heading-spark">✳</span></h1>
+            <p>Give pre-loved things a new home. Find what you need, from someone who gets campus life.</p>
           </div>
           <button
             className="marketplace-primary"
             onClick={() => setShowForm(!showForm)}
           >
-            {showForm ? "Close Form" : "+ List an Item"}
+            {showForm ? "Close form" : "+ List an item"}
           </button>
         </section>
 
         {showForm && (
           <form className="listing-form" onSubmit={handleSubmit}>
-            <h2>Create a listing</h2>
+            <div className="listing-form-heading">
+              <div><p className="marketplace-eyebrow">PASS IT ON</p><h2>Create a listing</h2></div>
+              <span>Honest photos help everyone shop with confidence.</span>
+            </div>
 
             <label>
               Item name
@@ -230,11 +246,12 @@ export default function Marketplace() {
               </label>
 
               <label>
-                Upload item photo
+                Item photo <span className="required-note">Required</span>
                 <input
                 type="file"
                 accept="image/jpeg,image/png,image/webp"
                 onChange={handleImageChange}
+                required
                 />
                {imagePreview && (
                 <img
@@ -295,6 +312,11 @@ export default function Marketplace() {
 
         {error && <p className="marketplace-error">{error}</p>}
 
+        <div className="marketplace-results-heading">
+          <div><p className="marketplace-eyebrow">FRESH FROM CAMPUS</p><h2>Find your next thing</h2></div>
+          {!loading && <span>{listings.length} {listings.length === 1 ? "listing" : "listings"}</span>}
+        </div>
+
         {loading ? (
           <p className="marketplace-message">Loading marketplace...</p>
         ) : listings.length === 0 ? (
@@ -320,7 +342,7 @@ export default function Marketplace() {
                     alt={item.title}
                   />
                 ) : (
-                  <div className="listing-image-placeholder">No image</div>
+                  <div className="listing-image-placeholder"><span>📦</span><small>Photo not added</small></div>
                 )}
 
                 <div className="listing-card-content">

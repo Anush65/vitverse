@@ -36,7 +36,7 @@ export default function Landing() {
     <div className="landing">
       <nav className="landing-nav">
         <div className="landing-brand">
-          <span className="navbar-brand-dot" />
+          <span className="landing-brand-mark">v</span>
           VITVerse
         </div>
         <div className="landing-nav-actions">
@@ -77,6 +77,27 @@ export default function Landing() {
               I already have an account
             </Link>
           </motion.div>
+        </motion.div>
+        <motion.div
+          className="landing-hero-art"
+          initial={{ opacity: 0, scale: 0.94, y: 12 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          transition={{ duration: 0.7, delay: 0.2, ease: "easeOut" }}
+          aria-hidden="true"
+        >
+          <div className="landing-art-ring landing-art-ring-one" />
+          <div className="landing-art-ring landing-art-ring-two" />
+          <div className="landing-art-core">
+            <span>V</span><i />
+          </div>
+          <div className="landing-art-card landing-art-market">
+            <span>🛍️</span><div><strong>Find your people</strong><small>Campus marketplace</small></div>
+          </div>
+          <div className="landing-art-card landing-art-food">
+            <span>🍜</span><div><strong>Lunch, sorted</strong><small>Skip the queue</small></div>
+          </div>
+          <span className="landing-art-spark landing-art-spark-one">✳</span>
+          <span className="landing-art-spark landing-art-spark-two">✦</span>
         </motion.div>
       </header>
 

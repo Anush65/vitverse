@@ -19,8 +19,68 @@ const BusNotice = require("./models/BusNotice");
 
 const DEMO_PASSWORD = "password123";
 
-function img(id) {
-  return `https://picsum.photos/id/${id}/600/400`;
+function img(photoId) {
+  return `https://images.unsplash.com/${photoId}?auto=format&fit=crop&w=900&q=85`;
+}
+
+const MENU_IMAGE_BY_NAME = {
+  "Veg Thali": img("photo-1547592180-85f173990554"),
+  "Chicken Biryani": img("photo-1589302168068-964664d93dc0"),
+  "Masala Dosa": img("photo-1668236543090-82eba5ee5976"),
+  "Paneer Butter Masala with Rice": img("photo-1603894584373-5ac82b2ae398"),
+  "Chicken 65": img("photo-1604908177453-7462950a6a3b"),
+  "Cold Coffee": img("photo-1461023058943-07fcbe16d735"),
+  "Masala Chai": img("photo-1571934811356-5cc061b6821f"),
+  "Gulab Jamun (2 pcs)": img("photo-1610192244261-3f33de3f55e4"),
+  "Margherita Pizza (Regular)": img("photo-1571407970349-bc81e7e96d47"),
+  "Farmhouse Pizza (Medium)": img("photo-1565299624946-b28f40a0ae38"),
+  "Pepperoni Pizza (Medium)": img("photo-1628840042765-356cda07504e"),
+  "Chicken Dominator Pizza": img("photo-1513104890138-7c749659a591"),
+  "Garlic Breadsticks": img("photo-1573140401552-3fab0b24306f"),
+  "Choco Lava Cake": img("photo-1578985545062-69928b1d9587"),
+  "Pepsi (500ml)": img("photo-1629203851122-3726ecdf080e"),
+};
+
+const LISTING_IMAGE_BY_TITLE = {
+  "Scientific Calculator - Casio fx-991EX": img("photo-1587145820266-a5951ee6f620"),
+  "Data Structures Textbook (CLRS)": img("photo-1544947950-fa07a98d237f"),
+  "Engineering Graphics Drafter Kit": img("photo-1513364776144-60967b0f800f"),
+  "Previous Year Question Papers Bundle": img("photo-1532012197267-da84d127e765"),
+  "Study Table LED Lamp": img("photo-1507473885765-e6ed057f782c"),
+  "Hot Water Kettle": img("photo-1572119865084-43c285814d63"),
+  "Laundry Bag (Large)": img("photo-1622560480654-d96214fdc887"),
+  "JBL Go Bluetooth Speaker": img("photo-1608043152269-423dbba4e7e1"),
+  "Mini Fridge for Hostel Room": img("photo-1571175443880-49e1d25b2bc5"),
+  "Noise Cancelling Headphones": img("photo-1505740420928-5e560c06d30e"),
+  "Portable Printer": img("photo-1612815154858-60aa4c59eaa6"),
+  "Winter Jacket (Size M)": img("photo-1544022613-e87ca75a784a"),
+  "Formal Shirt Set (3 pcs)": img("photo-1598033129183-c4f50c736f10"),
+  "Ethnic Wear for Cultural Night": img("photo-1610030469983-98e550d6193c"),
+  "Yonex Badminton Racket": img("photo-1622279457486-62dcc4a431d6"),
+  "Cricket Kit (Full Set)": img("photo-1531415074968-036ba1b575da"),
+  "Yoga Mat": img("photo-1592432678016-e910b452f9a2"),
+  "Bicycle for Rent": img("photo-1485965120184-e220f721d03e"),
+  "Acoustic Guitar": img("photo-1510915361894-db8b60106cb1"),
+  "Hostel Room Decor Lights": img("photo-1513506003901-1e6a229e2d15"),
+};
+
+async function refreshDemoImages() {
+  const legacyImage = /^https:\/\/picsum\.photos\//;
+  const updates = await Promise.all([
+    ...Object.entries(MENU_IMAGE_BY_NAME).map(([name, image]) =>
+      MenuItem.updateOne({ name, image: legacyImage }, { $set: { image } })
+    ),
+    ...Object.entries(LISTING_IMAGE_BY_TITLE).map(([title, image]) =>
+      Listing.updateOne(
+        { title, "images.0": legacyImage },
+        { $set: { "images.0": image } }
+      )
+    ),
+  ]);
+  const refreshed = updates.reduce((count, result) => count + result.modifiedCount, 0);
+  if (refreshed > 0) {
+    console.log(`  Refreshed ${refreshed} legacy demo images`);
+  }
 }
 
 function todayIST() {
@@ -79,23 +139,23 @@ async function runSeed() {
 
   console.log("\nSeeding menu items...");
   const gymkhanaMenu = await MenuItem.insertMany([
-    { canteen: gymkhana._id, name: "Veg Thali", description: "Rice, dal, sabzi, roti, curd, pickle", price: 90, category: "Meals", isVeg: true, image: img(292) },
-    { canteen: gymkhana._id, name: "Chicken Biryani", description: "Fragrant basmati rice with spiced chicken", price: 140, category: "Meals", isVeg: false, image: img(365) },
-    { canteen: gymkhana._id, name: "Masala Dosa", description: "Crispy dosa with spiced potato filling", price: 60, category: "Snacks", isVeg: true, image: img(431) },
-    { canteen: gymkhana._id, name: "Paneer Butter Masala with Rice", description: "Creamy paneer curry served with steamed rice", price: 120, category: "Meals", isVeg: true, image: img(493) },
-    { canteen: gymkhana._id, name: "Chicken 65", description: "Spicy deep-fried chicken bites", price: 110, category: "Fast Food", isVeg: false, image: img(488) },
-    { canteen: gymkhana._id, name: "Cold Coffee", description: "Chilled coffee blended with ice cream", price: 50, category: "Beverages", isVeg: true, image: img(30) },
-    { canteen: gymkhana._id, name: "Masala Chai", description: "Classic Indian spiced tea", price: 20, category: "Beverages", isVeg: true, image: img(225) },
-    { canteen: gymkhana._id, name: "Gulab Jamun (2 pcs)", description: "Soft milk dumplings in sugar syrup", price: 40, category: "Desserts", isVeg: true, image: img(312) },
+    { canteen: gymkhana._id, name: "Veg Thali", description: "Rice, dal, sabzi, roti, curd, pickle", price: 90, category: "Meals", isVeg: true, image: MENU_IMAGE_BY_NAME["Veg Thali"] },
+    { canteen: gymkhana._id, name: "Chicken Biryani", description: "Fragrant basmati rice with spiced chicken", price: 140, category: "Meals", isVeg: false, image: MENU_IMAGE_BY_NAME["Chicken Biryani"] },
+    { canteen: gymkhana._id, name: "Masala Dosa", description: "Crispy dosa with spiced potato filling", price: 60, category: "Snacks", isVeg: true, image: MENU_IMAGE_BY_NAME["Masala Dosa"] },
+    { canteen: gymkhana._id, name: "Paneer Butter Masala with Rice", description: "Creamy paneer curry served with steamed rice", price: 120, category: "Meals", isVeg: true, image: MENU_IMAGE_BY_NAME["Paneer Butter Masala with Rice"] },
+    { canteen: gymkhana._id, name: "Chicken 65", description: "Spicy deep-fried chicken bites", price: 110, category: "Fast Food", isVeg: false, image: MENU_IMAGE_BY_NAME["Chicken 65"] },
+    { canteen: gymkhana._id, name: "Cold Coffee", description: "Chilled coffee blended with ice cream", price: 50, category: "Beverages", isVeg: true, image: MENU_IMAGE_BY_NAME["Cold Coffee"] },
+    { canteen: gymkhana._id, name: "Masala Chai", description: "Classic Indian spiced tea", price: 20, category: "Beverages", isVeg: true, image: MENU_IMAGE_BY_NAME["Masala Chai"] },
+    { canteen: gymkhana._id, name: "Gulab Jamun (2 pcs)", description: "Soft milk dumplings in sugar syrup", price: 40, category: "Desserts", isVeg: true, image: MENU_IMAGE_BY_NAME["Gulab Jamun (2 pcs)"] },
   ]);
   const dominosMenu = await MenuItem.insertMany([
-    { canteen: dominos._id, name: "Margherita Pizza (Regular)", description: "Classic cheese and tomato pizza", price: 199, category: "Fast Food", isVeg: true, image: img(1080) },
-    { canteen: dominos._id, name: "Farmhouse Pizza (Medium)", description: "Loaded with fresh veggies", price: 349, category: "Fast Food", isVeg: true, image: img(1059) },
-    { canteen: dominos._id, name: "Pepperoni Pizza (Medium)", description: "Topped with spicy pepperoni", price: 399, category: "Fast Food", isVeg: false, image: img(1062) },
-    { canteen: dominos._id, name: "Chicken Dominator Pizza", description: "Loaded with double chicken toppings", price: 429, category: "Fast Food", isVeg: false, image: img(1063) },
-    { canteen: dominos._id, name: "Garlic Breadsticks", description: "Baked breadsticks with garlic butter", price: 99, category: "Snacks", isVeg: true, image: img(1074) },
-    { canteen: dominos._id, name: "Choco Lava Cake", description: "Warm chocolate cake with a molten center", price: 89, category: "Desserts", isVeg: true, image: img(1080) },
-    { canteen: dominos._id, name: "Pepsi (500ml)", description: "Chilled soft drink", price: 60, category: "Beverages", isVeg: true, image: img(425) },
+    { canteen: dominos._id, name: "Margherita Pizza (Regular)", description: "Classic cheese and tomato pizza", price: 199, category: "Fast Food", isVeg: true, image: MENU_IMAGE_BY_NAME["Margherita Pizza (Regular)"] },
+    { canteen: dominos._id, name: "Farmhouse Pizza (Medium)", description: "Loaded with fresh veggies", price: 349, category: "Fast Food", isVeg: true, image: MENU_IMAGE_BY_NAME["Farmhouse Pizza (Medium)"] },
+    { canteen: dominos._id, name: "Pepperoni Pizza (Medium)", description: "Topped with spicy pepperoni", price: 399, category: "Fast Food", isVeg: false, image: MENU_IMAGE_BY_NAME["Pepperoni Pizza (Medium)"] },
+    { canteen: dominos._id, name: "Chicken Dominator Pizza", description: "Loaded with double chicken toppings", price: 429, category: "Fast Food", isVeg: false, image: MENU_IMAGE_BY_NAME["Chicken Dominator Pizza"] },
+    { canteen: dominos._id, name: "Garlic Breadsticks", description: "Baked breadsticks with garlic butter", price: 99, category: "Snacks", isVeg: true, image: MENU_IMAGE_BY_NAME["Garlic Breadsticks"] },
+    { canteen: dominos._id, name: "Choco Lava Cake", description: "Warm chocolate cake with a molten center", price: 89, category: "Desserts", isVeg: true, image: MENU_IMAGE_BY_NAME["Choco Lava Cake"] },
+    { canteen: dominos._id, name: "Pepsi (500ml)", description: "Chilled soft drink", price: 60, category: "Beverages", isVeg: true, image: MENU_IMAGE_BY_NAME["Pepsi (500ml)"] },
   ]);
   console.log(`  ${gymkhanaMenu.length + dominosMenu.length} menu items created`);
 
@@ -156,26 +216,26 @@ async function runSeed() {
 
   console.log("\nSeeding marketplace listings...");
   const listingSeeds = [
-    { title: "Scientific Calculator - Casio fx-991EX", description: "Barely used, all functions working perfectly. Great for engineering courses.", category: "Academic", type: "sell", price: 650, condition: "Good", images: [img(60)] },
-    { title: "Data Structures Textbook (CLRS)", description: "Introduction to Algorithms, 3rd edition. Minor highlighting, otherwise great condition.", category: "Academic", type: "sell", price: 550, condition: "Good", images: [img(24)] },
-    { title: "Engineering Graphics Drafter Kit", description: "Complete drafter kit with compass, scales, and set squares. Unused, still in box.", category: "Academic", type: "sell", price: 450, condition: "New", images: [img(180)] },
-    { title: "Previous Year Question Papers Bundle", description: "Compiled PYQs for core engineering subjects, last 5 years. Printed and spiral bound.", category: "Academic", type: "sell", price: 150, condition: "Good", images: [img(48)] },
-    { title: "Study Table LED Lamp", description: "Adjustable brightness, USB powered. Perfect for late-night study sessions.", category: "Essentials", type: "sell", price: 300, condition: "Like New", images: [img(21)] },
-    { title: "Hot Water Kettle", description: "1L electric kettle, auto shut-off. Great for hostel rooms.", category: "Essentials", type: "sell", price: 400, condition: "Good", images: [img(225)] },
-    { title: "Laundry Bag (Large)", description: "Durable, foldable laundry bag with drawstring closure.", category: "Essentials", type: "sell", price: 200, condition: "New", images: [img(119)] },
-    { title: "JBL Go Bluetooth Speaker", description: "Compact and loud, great battery life. Selling because I upgraded.", category: "Electronics", type: "sell", price: 1200, condition: "Good", images: [img(367)] },
-    { title: "Mini Fridge for Hostel Room", description: "Compact fridge, perfect for hostel rooms. Available for weekly rent.", category: "Electronics", type: "rent", price: 500, rentalPeriod: "week", condition: "Good", images: [img(292)] },
-    { title: "Noise Cancelling Headphones", description: "Over-ear ANC headphones, 20hr battery life, barely used.", category: "Electronics", type: "sell", price: 2200, condition: "Good", images: [img(250)] },
-    { title: "Portable Printer", description: "Compact wireless printer, available for short-term rent during assignment season.", category: "Electronics", type: "rent", price: 150, rentalPeriod: "day", condition: "Fair", images: [img(96)] },
-    { title: "Winter Jacket (Size M)", description: "Warm winter jacket, worn only a few times. No damage or stains.", category: "Clothing", type: "sell", price: 800, condition: "Like New", images: [img(1011)] },
-    { title: "Formal Shirt Set (3 pcs)", description: "Formal shirts, perfect for interviews and presentations. Size M.", category: "Clothing", type: "sell", price: 600, condition: "Good", images: [img(91)] },
-    { title: "Ethnic Wear for Cultural Night", description: "Traditional outfit available for rent for cultural fest nights.", category: "Clothing", type: "rent", price: 300, rentalPeriod: "day", condition: "Good", images: [img(177)] },
-    { title: "Yonex Badminton Racket", description: "Lightweight racket, available for short-term rent. Great grip, recently restrung.", category: "Sports", type: "rent", price: 50, rentalPeriod: "day", condition: "Good", images: [img(433)] },
-    { title: "Cricket Kit (Full Set)", description: "Bat, pads, gloves, and helmet included. Great for weekend matches.", category: "Sports", type: "rent", price: 200, rentalPeriod: "day", condition: "Good", images: [img(466)] },
-    { title: "Yoga Mat", description: "Anti-slip yoga mat, brand new, unused.", category: "Sports", type: "sell", price: 250, condition: "New", images: [img(206)] },
-    { title: "Bicycle for Rent", description: "Well-maintained bicycle available for hourly rent around campus.", category: "Other", type: "rent", price: 30, rentalPeriod: "hour", condition: "Fair", images: [img(111)] },
-    { title: "Acoustic Guitar", description: "Great condition acoustic guitar, available for daily rent. New strings fitted.", category: "Other", type: "rent", price: 100, rentalPeriod: "day", condition: "Good", images: [img(1025)] },
-    { title: "Hostel Room Decor Lights", description: "Warm white LED string lights, unused, still in packaging.", category: "Other", type: "sell", price: 180, condition: "New", images: [img(20)] },
+    { title: "Scientific Calculator - Casio fx-991EX", description: "Barely used, all functions working perfectly. Great for engineering courses.", category: "Academic", type: "sell", price: 650, condition: "Good", images: [LISTING_IMAGE_BY_TITLE["Scientific Calculator - Casio fx-991EX"]] },
+    { title: "Data Structures Textbook (CLRS)", description: "Introduction to Algorithms, 3rd edition. Minor highlighting, otherwise great condition.", category: "Academic", type: "sell", price: 550, condition: "Good", images: [LISTING_IMAGE_BY_TITLE["Data Structures Textbook (CLRS)"]] },
+    { title: "Engineering Graphics Drafter Kit", description: "Complete drafter kit with compass, scales, and set squares. Unused, still in box.", category: "Academic", type: "sell", price: 450, condition: "New", images: [LISTING_IMAGE_BY_TITLE["Engineering Graphics Drafter Kit"]] },
+    { title: "Previous Year Question Papers Bundle", description: "Compiled PYQs for core engineering subjects, last 5 years. Printed and spiral bound.", category: "Academic", type: "sell", price: 150, condition: "Good", images: [LISTING_IMAGE_BY_TITLE["Previous Year Question Papers Bundle"]] },
+    { title: "Study Table LED Lamp", description: "Adjustable brightness, USB powered. Perfect for late-night study sessions.", category: "Essentials", type: "sell", price: 300, condition: "Like New", images: [LISTING_IMAGE_BY_TITLE["Study Table LED Lamp"]] },
+    { title: "Hot Water Kettle", description: "1L electric kettle, auto shut-off. Great for hostel rooms.", category: "Essentials", type: "sell", price: 400, condition: "Good", images: [LISTING_IMAGE_BY_TITLE["Hot Water Kettle"]] },
+    { title: "Laundry Bag (Large)", description: "Durable, foldable laundry bag with drawstring closure.", category: "Essentials", type: "sell", price: 200, condition: "New", images: [LISTING_IMAGE_BY_TITLE["Laundry Bag (Large)"]] },
+    { title: "JBL Go Bluetooth Speaker", description: "Compact and loud, great battery life. Selling because I upgraded.", category: "Electronics", type: "sell", price: 1200, condition: "Good", images: [LISTING_IMAGE_BY_TITLE["JBL Go Bluetooth Speaker"]] },
+    { title: "Mini Fridge for Hostel Room", description: "Compact fridge, perfect for hostel rooms. Available for weekly rent.", category: "Electronics", type: "rent", price: 500, rentalPeriod: "week", condition: "Good", images: [LISTING_IMAGE_BY_TITLE["Mini Fridge for Hostel Room"]] },
+    { title: "Noise Cancelling Headphones", description: "Over-ear ANC headphones, 20hr battery life, barely used.", category: "Electronics", type: "sell", price: 2200, condition: "Good", images: [LISTING_IMAGE_BY_TITLE["Noise Cancelling Headphones"]] },
+    { title: "Portable Printer", description: "Compact wireless printer, available for short-term rent during assignment season.", category: "Electronics", type: "rent", price: 150, rentalPeriod: "day", condition: "Fair", images: [LISTING_IMAGE_BY_TITLE["Portable Printer"]] },
+    { title: "Winter Jacket (Size M)", description: "Warm winter jacket, worn only a few times. No damage or stains.", category: "Clothing", type: "sell", price: 800, condition: "Like New", images: [LISTING_IMAGE_BY_TITLE["Winter Jacket (Size M)"]] },
+    { title: "Formal Shirt Set (3 pcs)", description: "Formal shirts, perfect for interviews and presentations. Size M.", category: "Clothing", type: "sell", price: 600, condition: "Good", images: [LISTING_IMAGE_BY_TITLE["Formal Shirt Set (3 pcs)"]] },
+    { title: "Ethnic Wear for Cultural Night", description: "Traditional outfit available for rent for cultural fest nights.", category: "Clothing", type: "rent", price: 300, rentalPeriod: "day", condition: "Good", images: [LISTING_IMAGE_BY_TITLE["Ethnic Wear for Cultural Night"]] },
+    { title: "Yonex Badminton Racket", description: "Lightweight racket, available for short-term rent. Great grip, recently restrung.", category: "Sports", type: "rent", price: 50, rentalPeriod: "day", condition: "Good", images: [LISTING_IMAGE_BY_TITLE["Yonex Badminton Racket"]] },
+    { title: "Cricket Kit (Full Set)", description: "Bat, pads, gloves, and helmet included. Great for weekend matches.", category: "Sports", type: "rent", price: 200, rentalPeriod: "day", condition: "Good", images: [LISTING_IMAGE_BY_TITLE["Cricket Kit (Full Set)"]] },
+    { title: "Yoga Mat", description: "Anti-slip yoga mat, brand new, unused.", category: "Sports", type: "sell", price: 250, condition: "New", images: [LISTING_IMAGE_BY_TITLE["Yoga Mat"]] },
+    { title: "Bicycle for Rent", description: "Well-maintained bicycle available for hourly rent around campus.", category: "Other", type: "rent", price: 30, rentalPeriod: "hour", condition: "Fair", images: [LISTING_IMAGE_BY_TITLE["Bicycle for Rent"]] },
+    { title: "Acoustic Guitar", description: "Great condition acoustic guitar, available for daily rent. New strings fitted.", category: "Other", type: "rent", price: 100, rentalPeriod: "day", condition: "Good", images: [LISTING_IMAGE_BY_TITLE["Acoustic Guitar"]] },
+    { title: "Hostel Room Decor Lights", description: "Warm white LED string lights, unused, still in packaging.", category: "Other", type: "sell", price: 180, condition: "New", images: [LISTING_IMAGE_BY_TITLE["Hostel Room Decor Lights"]] },
   ];
   const listings = await Listing.insertMany(
     listingSeeds.map((item, i) => ({ ...item, seller: students[i % students.length]._id }))
@@ -218,7 +278,7 @@ async function runSeed() {
   console.log("================================================\n");
 }
 
-module.exports = runSeed;
+module.exports = { runSeed, refreshDemoImages };
 
 // Run directly via `npm run seed` (not when imported by server.js)
 if (require.main === module) {

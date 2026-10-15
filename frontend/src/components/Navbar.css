@@ -5,50 +5,59 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0.85rem 2rem;
-  background: var(--color-surface);
+  padding: 0.75rem max(2rem, calc((100vw - 1320px) / 2));
+  background: color-mix(in srgb, var(--color-surface) 90%, transparent);
   border-bottom: 1px solid var(--color-border);
-  flex-wrap: wrap;
-  gap: 1rem;
-  backdrop-filter: saturate(180%) blur(8px);
+  gap: 1.25rem;
+  backdrop-filter: saturate(160%) blur(18px);
 }
 
 .navbar-brand {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  font-size: 1.2rem;
+  gap: 0.65rem;
+  font-size: 1.15rem;
   font-weight: 800;
   color: var(--color-text);
   text-decoration: none;
   letter-spacing: -0.02em;
 }
 
-.navbar-brand-dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 3px;
-  background: var(--gradient-brand);
-  display: inline-block;
+.navbar-brand-mark {
+  display: grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 10px;
+  background: var(--color-primary);
+  color: #fff;
+  font-size: 1.15rem;
+  font-weight: 800;
+  font-style: italic;
+  box-shadow: 0 4px 10px rgba(40, 99, 68, 0.2);
 }
 
 .navbar-links {
   display: flex;
-  gap: 0.3rem;
-  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.2rem;
 }
 
 .nav-link {
   display: flex;
   align-items: center;
-  gap: 0.4rem;
+  gap: 0.45rem;
   color: var(--color-text-secondary);
   text-decoration: none;
   font-weight: 600;
-  font-size: 0.9rem;
-  padding: 0.5rem 0.75rem;
-  border-radius: 8px;
-  transition: background 0.15s ease, color 0.15s ease;
+  font-size: 0.82rem;
+  padding: 0.55rem 0.75rem;
+  border-radius: 10px;
+  transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
+}
+
+.nav-link:hover {
+  transform: translateY(-1px);
 }
 
 .nav-link-icon {
@@ -68,24 +77,40 @@
 .navbar-actions {
   display: flex;
   align-items: center;
-  gap: 0.9rem;
+  gap: 0.7rem;
 }
 
 .navbar-user {
-  color: var(--color-text-secondary);
-  font-size: 0.9rem;
-  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--color-text);
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.navbar-user-avatar {
+  display: grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+  font-size: 0.68rem;
+  font-weight: 800;
 }
 
 .theme-toggle {
   background: none;
   border: 1px solid var(--color-border);
-  border-radius: 8px;
+  border-radius: 10px;
   width: 2.2rem;
   height: 2.2rem;
   cursor: pointer;
   font-size: 1rem;
-  transition: background 0.15s ease, transform 0.15s ease;
+  transition: background 0.2s ease, transform 0.2s ease;
 }
 
 .theme-toggle:hover {
@@ -93,22 +118,78 @@
   transform: rotate(15deg);
 }
 
-@media (max-width: 860px) {
+.navbar-logout {
+  padding: 0.55rem 0.8rem;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  background: transparent;
+  color: var(--color-text-secondary);
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.navbar-logout:hover {
+  background: var(--color-surface-hover);
+  color: var(--color-text);
+}
+
+@media (max-width: 1050px) {
   .navbar {
-    padding: 0.75rem 1.1rem;
+    padding: 0.75rem 1.25rem;
+    gap: 0.5rem;
   }
 
   .nav-link {
     font-size: 0;
     gap: 0;
-    padding: 0.5rem;
+    padding: 0.6rem;
   }
 
   .nav-link .nav-link-icon {
-    font-size: 1.2rem;
+    font-size: 1.1rem;
   }
 
-  .navbar-user {
+  .navbar-user > span:last-child {
+    display: none;
+  }
+}
+
+@media (max-width: 560px) {
+  .navbar {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    padding: 0.65rem 0.85rem 0.5rem;
+    gap: 0.5rem;
+  }
+
+  .navbar-brand {
+    font-size: 1rem;
+  }
+
+  .navbar-actions {
+    justify-self: end;
+    gap: 0.45rem;
+  }
+
+  .navbar-links {
+    grid-column: 1 / -1;
+    justify-content: space-between;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .navbar-links::-webkit-scrollbar {
+    display: none;
+  }
+
+  .nav-link {
+    padding: 0.5rem 0.6rem;
+  }
+
+  .navbar-logout {
     display: none;
   }
 }

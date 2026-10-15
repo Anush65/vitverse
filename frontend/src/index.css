@@ -1,19 +1,21 @@
 :root {
-  --color-bg: #f6f7fb;
+  --color-bg: #f5f6f1;
   --color-surface: #ffffff;
-  --color-surface-hover: #f1f0fe;
-  --color-text: #171923;
-  --color-text-secondary: #677085;
-  --color-border: #e4e6ef;
-  --color-primary: #6a5bf6;
-  --color-primary-hover: #5543f0;
-  --color-primary-soft: #eeecff;
+  --color-surface-hover: #edf2e9;
+  --color-text: #17251d;
+  --color-text-secondary: #6b786e;
+  --color-border: #e1e8de;
+  --color-primary: #286344;
+  --color-primary-hover: #1f5036;
+  --color-primary-soft: #e8f2e6;
   --color-primary-contrast: #ffffff;
   --color-error: #ef4444;
   --color-success: #16a34a;
-  --shadow-card: 0 2px 14px rgba(23, 23, 50, 0.07);
-  --shadow-card-hover: 0 14px 30px rgba(90, 80, 220, 0.16);
-  --gradient-brand: linear-gradient(135deg, #6a5bf6 0%, #8b7bff 50%, #5543f0 100%);
+  --shadow-card: 0 8px 24px rgba(31, 62, 39, 0.055);
+  --shadow-card-hover: 0 18px 38px rgba(31, 62, 39, 0.12);
+  --gradient-brand: linear-gradient(135deg, #1f5139 0%, #2c704c 58%, #44804b 100%);
+  --color-lime: #d6f27a;
+  --color-ink-inverse: #f6f8ef;
   --font-sans: "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
 
   --accent-marketplace: #f59e0b;
@@ -29,21 +31,21 @@
 }
 
 [data-theme="dark"] {
-  --color-bg: #0e0f1a;
-  --color-surface: #171927;
-  --color-surface-hover: #20223a;
-  --color-text: #f1f1f8;
-  --color-text-secondary: #9a9fc0;
-  --color-border: #2b2d47;
-  --color-primary: #8f80ff;
-  --color-primary-hover: #a99cff;
-  --color-primary-soft: #262849;
-  --color-primary-contrast: #0e0f1a;
+  --color-bg: #101914;
+  --color-surface: #19231c;
+  --color-surface-hover: #233027;
+  --color-text: #eef4ec;
+  --color-text-secondary: #a2b0a1;
+  --color-border: #2b392e;
+  --color-primary: #8fca8f;
+  --color-primary-hover: #a5dca3;
+  --color-primary-soft: #243629;
+  --color-primary-contrast: #102016;
   --color-error: #f87171;
   --color-success: #4ade80;
-  --shadow-card: 0 2px 18px rgba(0, 0, 0, 0.45);
-  --shadow-card-hover: 0 16px 34px rgba(0, 0, 0, 0.55);
-  --gradient-brand: linear-gradient(135deg, #4b3fce 0%, #6a5bf6 50%, #8f80ff 100%);
+  --shadow-card: 0 8px 24px rgba(0, 0, 0, 0.18);
+  --shadow-card-hover: 0 18px 38px rgba(0, 0, 0, 0.32);
+  --gradient-brand: linear-gradient(135deg, #193c2b 0%, #24583c 58%, #347041 100%);
 
   --accent-marketplace: #fbbf24;
   --accent-marketplace-soft: #322611;
@@ -69,10 +71,12 @@ body {
 
 body {
   font-family: var(--font-sans);
-  background: var(--color-bg);
+  background:
+    radial-gradient(ellipse at 88% 0%, rgba(214, 242, 122, 0.08), transparent 30rem),
+    var(--color-bg);
   color: var(--color-text);
   min-height: 100vh;
-  transition: background 0.2s ease, color 0.2s ease;
+  transition: background 0.3s ease, color 0.3s ease;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -85,7 +89,7 @@ h2,
 h3 {
   margin: 0 0 0.5rem;
   letter-spacing: -0.02em;
-  font-weight: 700;
+  font-weight: 750;
 }
 
 p {
@@ -96,6 +100,23 @@ p {
 
 button {
   font-family: inherit;
+}
+
+button,
+a,
+input,
+select,
+textarea {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--color-primary) 45%, transparent);
+  outline-offset: 3px;
 }
 
 a {
@@ -109,19 +130,19 @@ a {
 .btn {
   padding: 0.65rem 1.2rem;
   border: none;
-  border-radius: 10px;
+  border-radius: 12px;
   background: var(--color-primary);
   color: var(--color-primary-contrast);
   font-size: 0.95rem;
   font-weight: 600;
   cursor: pointer;
-  transition: background 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+  transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .btn:hover:not(:disabled) {
   background: var(--color-primary-hover);
   transform: translateY(-1px);
-  box-shadow: 0 8px 18px rgba(90, 80, 220, 0.25);
+  box-shadow: 0 8px 18px rgba(40, 99, 68, 0.2);
 }
 
 .btn:disabled {
@@ -158,10 +179,22 @@ a {
 
 .card {
   background: var(--color-surface);
-  border-radius: 16px;
+  border: 1px solid var(--color-border);
+  border-radius: 20px;
   box-shadow: var(--shadow-card);
-  padding: 2rem;
+  padding: 1.5rem;
   transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
 .text-error {

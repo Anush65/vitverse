@@ -16,6 +16,12 @@ export default function Navbar() {
   const { user, logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
+  const initials = (user?.name || "V")
+    .split(" ")
+    .map((part) => part[0])
+    .slice(0, 2)
+    .join("")
+    .toUpperCase();
 
   function handleLogout() {
     logout();
@@ -25,7 +31,7 @@ export default function Navbar() {
   return (
     <nav className="navbar">
       <Link to="/dashboard" className="navbar-brand">
-        <span className="navbar-brand-dot" />
+        <span className="navbar-brand-mark" aria-hidden="true">v</span>
         VITVerse
       </Link>
       <div className="navbar-links">
@@ -41,12 +47,15 @@ export default function Navbar() {
         ))}
       </div>
       <div className="navbar-actions">
-        <button type="button" className="theme-toggle" onClick={toggleTheme} aria-label="Toggle theme">
+        <button type="button" className="theme-toggle" onClick={toggleTheme} aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} mode`} title="Change theme">
           {theme === "dark" ? "☀️" : "🌙"}
         </button>
-        <span className="navbar-user">{user?.name}</span>
-        <button type="button" className="btn btn-secondary" onClick={handleLogout}>
-          Logout
+        <Link to="/profile" className="navbar-user" aria-label={`Open ${user?.name || "student"}'s profile`}>
+          <span className="navbar-user-avatar">{initials}</span>
+          <span>{user?.name?.split(" ")[0]}</span>
+        </Link>
+        <button type="button" className="navbar-logout" onClick={handleLogout}>
+          Sign out
         </button>
       </div>
     </nav>

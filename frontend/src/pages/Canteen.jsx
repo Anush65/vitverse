@@ -152,8 +152,25 @@ export default function Canteen() {
 
   return (
     <AppLayout>
-      <h1>Canteen</h1>
-      <p>Join a live queue, or order food ahead and skip the line entirely.</p>
+      <div className="canteen-page">
+      <section className="canteen-hero">
+        <div>
+          <p className="canteen-eyebrow">GOOD FOOD, LESS WAITING</p>
+          <h1>Something delicious is close.</h1>
+          <p>Order ahead or check the queue before you head over. Lunch break, reclaimed.</p>
+        </div>
+        <div className="canteen-hero-illustration" aria-hidden="true">
+          <span className="canteen-plate">🍛</span>
+          <span className="canteen-hero-spark canteen-spark-one">✳</span>
+          <span className="canteen-hero-spark canteen-spark-two">✦</span>
+          <span className="canteen-hero-sticker">made for<br />the break</span>
+        </div>
+      </section>
+
+      <div className="canteen-section-heading">
+        <div><p className="canteen-eyebrow">ON CAMPUS</p><h2>Where to eat</h2></div>
+        <span>Pick a spot, then let us handle the line.</span>
+      </div>
 
       {error && <p className="text-error" style={{ marginTop: "1rem" }}>{error}</p>}
       {notice && <p className="text-success" style={{ marginTop: "1rem" }}>{notice}</p>}
@@ -183,8 +200,12 @@ export default function Canteen() {
           <div key={canteen._id} className="canteen-block">
             <div className="card canteen-row">
               <div>
-                <h2>{canteen.name}</h2>
+                <div className="canteen-title-row">
+                  <h2>{canteen.name}</h2>
+                  {canteen.isOpen ? <span className="open-pill"><span /> Open now</span> : null}
+                </div>
                 <p>{canteen.location}</p>
+                <span className="canteen-serving-note">~{canteen.avgServingMinutes || "A few"} min average service</span>
               </div>
               <div className="canteen-actions">
                 <button
@@ -273,7 +294,7 @@ export default function Canteen() {
 
       <h2 className="orders-heading">My Orders</h2>
       {orders.length === 0 ? (
-        <p>No orders yet — order food from a canteen above.</p>
+        <div className="canteen-empty-orders"><span>🥢</span><p>No orders yet. Your next good meal is just above.</p></div>
       ) : (
         <div className="orders-list">
           {orders.map((order) => (
@@ -297,6 +318,7 @@ export default function Canteen() {
           ))}
         </div>
       )}
+      </div>
     </AppLayout>
   );
 }
