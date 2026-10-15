@@ -471,27 +471,27 @@
 }
 
 .feature-card.accent-marketplace {
-  --feature-accent: #b47218;
+  --feature-accent: var(--accent-marketplace-text);
   --feature-accent-soft: var(--accent-marketplace-soft);
 }
 
 .feature-card.accent-canteen {
-  --feature-accent: #18845f;
+  --feature-accent: var(--accent-canteen-text);
   --feature-accent-soft: var(--accent-canteen-soft);
 }
 
 .feature-card.accent-bus {
-  --feature-accent: #1883a9;
+  --feature-accent: var(--accent-bus-text);
   --feature-accent-soft: var(--accent-bus-soft);
 }
 
 .feature-card.accent-notices {
-  --feature-accent: #ca4a5f;
+  --feature-accent: var(--accent-notices-text);
   --feature-accent-soft: var(--accent-notices-soft);
 }
 
 .feature-card.accent-profile {
-  --feature-accent: #7655b7;
+  --feature-accent: var(--accent-profile-text);
   --feature-accent-soft: var(--accent-profile-soft);
 }
 

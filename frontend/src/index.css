@@ -28,6 +28,12 @@
   --accent-notices-soft: #fee9ed;
   --accent-profile: #8b5cf6;
   --accent-profile-soft: #f1ebff;
+  --accent-marketplace-text: #8a5708;
+  --accent-canteen-text: #08714c;
+  --accent-bus-text: #087094;
+  --accent-notices-text: #b8324c;
+  --accent-profile-text: #6741a3;
+  color-scheme: light;
 }
 
 [data-theme="dark"] {
@@ -57,6 +63,12 @@
   --accent-notices-soft: #341620;
   --accent-profile: #a78bfa;
   --accent-profile-soft: #241b3f;
+  --accent-marketplace-text: #ffd166;
+  --accent-canteen-text: #7de3b5;
+  --accent-bus-text: #78d7f7;
+  --accent-notices-text: #ff9aaa;
+  --accent-profile-text: #c7b0ff;
+  color-scheme: dark;
 }
 
 * {

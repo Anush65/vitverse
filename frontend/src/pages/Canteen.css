@@ -234,18 +234,18 @@
 }
 
 .status-preparing {
-  background: #fef3c7;
-  color: #92400e;
+  background: var(--accent-marketplace-soft);
+  color: var(--accent-marketplace-text);
 }
 
 .status-ready {
-  background: #dbeafe;
-  color: #1e40af;
+  background: var(--accent-bus-soft);
+  color: var(--accent-bus-text);
 }
 
 .status-completed {
-  background: #d1fae5;
-  color: #065f46;
+  background: var(--accent-canteen-soft);
+  color: var(--accent-canteen-text);
 }
 
 .status-cancelled {
@@ -292,14 +292,14 @@
 
 .canteen-eyebrow {
   margin-bottom: 0.45rem;
-  color: #a26228;
+  color: var(--accent-marketplace-text);
   font-size: 0.63rem;
   font-weight: 850;
   letter-spacing: 0.15em;
 }
 
 [data-theme="dark"] .canteen-eyebrow {
-  color: #edb875;
+  color: var(--accent-marketplace-text);
 }
 
 .canteen-hero h1 {
@@ -456,11 +456,11 @@
 
 .open-pill {
   background: var(--accent-canteen-soft);
-  color: #19724e;
+  color: var(--accent-canteen-text);
 }
 
 [data-theme="dark"] .open-pill {
-  color: #7fe0b5;
+  color: var(--accent-canteen-text);
 }
 
 .open-pill span {

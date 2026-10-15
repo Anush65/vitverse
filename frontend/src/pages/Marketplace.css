@@ -249,7 +249,7 @@
 
 .marketplace-eyebrow {
   margin: 0 0 0.5rem;
-  color: #a56813;
+  color: var(--accent-marketplace-text);
   font-size: 0.65rem;
   font-weight: 800;
   letter-spacing: 0.14em;
@@ -281,14 +281,14 @@
 
 .marketplace-primary {
   border-radius: 12px;
-  background: #286344;
+  background: var(--color-primary);
   box-shadow: 0 7px 16px rgba(40, 99, 68, 0.15);
   transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
 }
 
 .marketplace-primary:hover:not(:disabled) {
   transform: translateY(-2px);
-  background: #1f5036;
+  background: var(--color-primary-hover);
   box-shadow: 0 10px 20px rgba(40, 99, 68, 0.22);
 }
 
