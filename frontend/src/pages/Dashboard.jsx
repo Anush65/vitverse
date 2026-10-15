@@ -101,7 +101,7 @@ export default function Dashboard() {
         transition={{ duration: 0.55, ease: "easeOut" }}
       >
         <div className="dashboard-hero-copy">
-          <p className="dashboard-date"><span className="dashboard-live-dot" />{today} <span>·</span> VIT Vellore</p>
+          <p className="dashboard-date"><span className="dashboard-live-dot" />{today} <span>·</span> VIT Chennai</p>
           <p className="dashboard-eyebrow">YOUR CAMPUS, IN SYNC</p>
           <h1>{greeting()}, {firstName}<span className="dashboard-wave"> ✳</span></h1>
           <p className="dashboard-subtitle">

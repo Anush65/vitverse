@@ -76,10 +76,18 @@ async function refreshDemoImages() {
         { $set: { "images.0": image } }
       )
     ),
+    Canteen.updateOne(
+      { name: "Gymkhana", location: /VIT\s+Vellore/i },
+      { $set: { location: "Gymkhana Ground, VIT Chennai" } }
+    ),
+    Canteen.updateOne(
+      { name: "Domino's", location: /VIT\s+Vellore/i },
+      { $set: { location: "G1 Block, VIT Chennai" } }
+    ),
   ]);
   const refreshed = updates.reduce((count, result) => count + result.modifiedCount, 0);
   if (refreshed > 0) {
-    console.log(`  Refreshed ${refreshed} legacy demo images`);
+    console.log(`  Refreshed ${refreshed} legacy demo images and campus locations`);
   }
 }
 
@@ -132,8 +140,8 @@ async function runSeed() {
 
   console.log("\nSeeding canteens...");
   const [gymkhana, dominos] = await Canteen.insertMany([
-    { name: "Gymkhana", location: "Gymkhana Ground, VIT Vellore", avgServingMinutes: 5, isOpen: true },
-    { name: "Domino's", location: "G1 Block, VIT Vellore", avgServingMinutes: 8, isOpen: true },
+    { name: "Gymkhana", location: "Gymkhana Ground, VIT Chennai", avgServingMinutes: 5, isOpen: true },
+    { name: "Domino's", location: "G1 Block, VIT Chennai", avgServingMinutes: 8, isOpen: true },
   ]);
   console.log(`  Gymkhana + Domino's created`);
 
